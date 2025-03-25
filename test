@@ -1,0 +1,299 @@
+Unha empresa utiliza ficheiros XML para realizar o inventario, entre outras cousas, de impresoras.
+Para cada impresora quérese gardar o seu número de serie, marca, modelo, peso, tamaños de
+papel cos que pode traballar, o cartucho que usa, o tipo, o ano de compra e se está en rede ou non
+Escribe un XML Schema para estes ficheiros, elixindo os tipos de datos máis apropiados e tendo
+en conta que:
+✓ O peso é un número positivo e non pode ter máis de dous decimáis.
+✓ Pode haber máis dun tamaño.
+✓ O atributo tipo só pode tomar os valores ‘matricial’, ‘láser’ e ‘tinta’. É obrigatorio.
+✓ O atributo numSerie é obrigatorio e fai de identificador.
+✓ O cartucho está formado por unha C maiúscula, un guión, tres números e unha ou dúas
+letras maiúsculas.
+✓ Todos os elementos son obrigatorios, menos enred.
+✓ O elemento enred é opcional. De estar presente, é un elemento valeiro.
+✓ O atributo compra, opcional, garda o ano de compra. É un número enteiro positivo.
+✓ En cada ficheiro hai datos para unha ou máis impresoras
+
+xsd
+
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="impresoras">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="impresora" minOccurs="1" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="marca" type="xs:string"/>
+              <xs:element name="modelo" type="xs:string"/>
+              <xs:element name="peso">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:minInclusive value="0"/>
+                    <xs:fractionDigits value="2"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="tamaño" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
+              <xs:element name="cartucho">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:pattern value="C-\d{3}[A-Z]{1,2}"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="enred" minOccurs="0"/>
+            </xs:sequence>
+            <xs:attribute name="numSerie" type="xs:ID" use="required"/>
+            <xs:attribute name="tipo" use="required">
+              <xs:simpleType>
+                <xs:restriction base="xs:string">
+                  <xs:enumeration value="matricial"/>
+                  <xs:enumeration value="laser"/>
+                  <xs:enumeration value="tinta"/>
+                </xs:restriction>
+              </xs:simpleType>
+            </xs:attribute>
+            <xs:attribute name="compra" type="xs:positiveInteger" use="optional"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+
+
+
+
+---------
+Unha asociación de xogadores de mus utiliza ficheiros XML para almacenar a información dos
+torneos que organiza. Para cada torneo quérese gardar o ano en que se realizou, o anterior
+gañador (o seu id) e a información dos participantes. Dos participantes quérese almacenar o seu
+identificador, o da súa parella, o seu nome completo, idade, país e tamén se é cabeza de serie ou non
+Escribe un DTD adecuado para estes ficheiros, tendo en conta que:
+✓ Todos os atributos son obrigatorios.
+✓ O atributo idP fai de identificador.
+✓ O atributo pareja é o identificador doutro participante que forzosamente debe estar
+presente no ficheiro.
+✓ O elemento cabezaDeSerie é opcional, os demáis son obrigatorios.
+✓ En cada ficheiro hai datos para un so torneo.
+✓ O torneo ten que ter participantes
+
+dtd
+
+<!ELEMENT torneo (participante+)>
+<!ATTLIST torneo
+    edicion CDATA #REQUIRED
+    anteriorGanador IDREF #REQUIRED
+>
+
+<!ELEMENT participante (nombre, edad, pais, cabezaDeSerie?)>
+<!ATTLIST participante
+    idP ID #REQUIRED
+    pareja IDREF #REQUIRED
+>
+
+<!ELEMENT nombre (#PCDATA)>
+<!ELEMENT edad (#PCDATA)>
+<!ELEMENT pais (#PCDATA)>
+<!ELEMENT cabezaDeSerie EMPTY>
+
+
+------------
+
+?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ligaDeFutbol [
+  <!ELEMENT ligaDeFutbol (partido*)>
+  <!ELEMENT partido (local, visitante)>
+  <!ELEMENT local (nombre, goles)>
+  <!ELEMENT visitante (nombre, goles)>
+  <!ELEMENT nombre (#PCDATA)>
+  <!ELEMENT goles (#PCDATA)>
+]>
+
+<ligaDeFutbol>
+  <partido>
+    <local>
+      <nombre>Nottingham Presa</nombre>
+      <goles>0</goles>
+    </local>
+    <visitante>
+      <nombre>Inter de Mitente</nombre>
+      <goles>1</goles>
+    </visitante>
+  </partido>
+  <partido>
+    <local>
+      <nombre>Vodka Juniors</nombre>
+      <goles>3</goles>
+    </local>
+    <visitante>
+      <nombre>Sparta da Risa</nombre>
+      <goles>3</goles>
+    </visitante>
+  </partido>
+  <partido>
+    <local>
+      <nombre>Water de Múnich</nombre>
+      <goles>4</goles>
+    </local>
+    <visitante>
+      <nombre>Esteaua es del grifo</nombre>
+      <goles>2</goles>
+    </visitante>
+  </partido>
+</ligaDeFutbol>
+
+
+
+-----------------------
+
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ligaDeFutbol [
+  <!ELEMENT ligaDeFutbol (partido*)>
+  <!ELEMENT partido (local, visitante)>
+  <!ELEMENT local (#PCDATA)>
+  <!ELEMENT visitante (#PCDATA)>
+  <!ATTLIST local goles CDATA #REQUIRED>
+  <!ATTLIST visitante goles CDATA #REQUIRED>
+]>
+
+<ligaDeFutbol>
+  <partido>
+    <local goles="0">Nottingham Presa</local>
+    <visitante goles="1">Inter de Mitente</visitante>
+  </partido>
+  <partido>
+    <local goles="3">Vodka Juniors</local>
+    <visitante goles="3">Sparta da Risa</visitante>
+  </partido>
+  <partido>
+    <local goles="4">Water de Múnich</local>
+    <visitante goles="2">Esteaua es del grifo</visitante>
+  </partido>
+</ligaDeFutbol>
+
+
+-----------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ligaDeFutbol [
+  <!ELEMENT ligaDeFutbol (partido*)>
+  <!ELEMENT partido EMPTY>
+  <!ATTLIST partido localNombre CDATA #REQUIRED>
+  <!ATTLIST partido localGoles CDATA #REQUIRED>
+  <!ATTLIST partido visitanteNombre CDATA #REQUIRED>
+  <!ATTLIST partido visitanteGoles CDATA #REQUIRED>
+]>
+
+<ligaDeFutbol>
+  <partido localNombre="Nottingham Presa" localGoles="0" visitanteNombre="Inter de Mitente" visitanteGoles="1" />
+  <partido localNombre="Vodka Juniors" localGoles="3"  visitanteNombre="Sparta da Risa" visitanteGoles="3" />
+  <partido localNombre="Water de Múnich" localGoles="4" visitanteNombre="Esteaua es del grifo" visitanteGoles="2" />
+</ligaDeFutbol>
+
+-------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE personas [
+    <!-- Definición de la estructura -->
+    <!ELEMENT personas (persona+)>
+    <!ELEMENT persona (nombre, edad, genero, correo, telefono)>
+    <!ATTLIST persona id ID #REQUIRED>
+
+    <!-- Definición de elementos -->
+    <!ELEMENT nombre (#PCDATA)>
+    <!ELEMENT edad (#PCDATA)>
+    <!ELEMENT genero (#PCDATA)>
+    <!ELEMENT correo (#PCDATA)>
+    <!ELEMENT telefono (#PCDATA)>
+
+    <!-- Restricciones -->
+    
+    <!-- Restricción de género (solo puede ser Masculino o Femenino) -->
+    <!ENTITY % genero "Masculino | Femenino">
+    <!ELEMENT genero (#PCDATA)>
+    <!ATTLIST genero ENUMERATION %genero; #REQUIRED>
+
+    <!-- Restricción de edad (debe ser un número) -->
+    <!ELEMENT edad (#PCDATA)>
+    <!ATTLIST edad CDATA #REQUIRED>
+
+    <!-- Restricción de correo (debe contener '@' y un dominio, simulación con NOTATION) -->
+    <!NOTATION email SYSTEM "Formato: usuario@dominio.com">
+    <!ATTLIST correo NOTATION (email) #IMPLIED>
+
+    <!-- Restricción de teléfono (debe tener exactamente 9 dígitos, simulación con NOTATION) -->
+    <!NOTATION telefono SYSTEM "Formato: 9 dígitos">
+    <!ATTLIST telefono NOTATION (telefono) #IMPLIED>
+
+]>
+<personas>
+    <persona id="1">
+        <nombre>Juan Pérez</nombre>
+        <edad>25</edad>
+        <genero>Masculino</genero>
+        <correo>juan.perez@example.com</correo>
+        <telefono>123456789</telefono>
+    </persona>
+</personas>
+
+------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+<personas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+        <!-- Definición del elemento raíz -->
+        <xsd:element name="personas">
+            <xsd:complexType>
+                <xsd:sequence>
+                    <xsd:element name="persona" maxOccurs="unbounded">
+                        <xsd:complexType>
+                            <xsd:sequence>
+                                <xsd:element name="nombre" type="xsd:string"/>
+                                <xsd:element name="edad">
+                                    <xsd:simpleType>
+                                        <xsd:restriction base="xsd:int">
+                                            <xsd:minInclusive value="0"/>
+                                            <xsd:maxInclusive value="120"/>
+                                        </xsd:restriction>
+                                    </xsd:simpleType>
+                                </xsd:element>
+                                <xsd:element name="genero">
+                                    <xsd:simpleType>
+                                        <xsd:restriction base="xsd:string">
+                                            <xsd:enumeration value="Masculino"/>
+                                            <xsd:enumeration value="Femenino"/>
+                                        </xsd:restriction>
+                                    </xsd:simpleType>
+                                </xsd:element>
+                                <xsd:element name="correo">
+                                    <xsd:simpleType>
+                                        <xsd:restriction base="xsd:string">
+                                            <xsd:pattern value=".+@.+\..+"/>
+                                        </xsd:restriction>
+                                    </xsd:simpleType>
+                                </xsd:element>
+                                <xsd:element name="telefono">
+                                    <xsd:simpleType>
+                                        <xsd:restriction base="xsd:string">
+                                            <xsd:pattern value="\d{9}"/>
+                                        </xsd:restriction>
+                                    </xsd:simpleType>
+                                </xsd:element>
+                            </xsd:sequence>
+                            <xsd:attribute name="id" type="xsd:int" use="required"/>
+                        </xsd:complexType>
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:element>
+
+    </xsd:schema>
+
+    <persona id="1">
+        <nombre>Juan Pérez</nombre>
+        <edad>25</edad>
+        <genero>Masculino</genero>
+        <correo>juan.perez@example.com</correo>
+        <telefono>123456789</telefono>
+    </persona>
+</personas>
